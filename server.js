@@ -21,21 +21,29 @@ var mongoStore = 		require("connect-mongo");
 // './' is current directory 
 var configDB = require('./config/database.js');
 // need to connect the database with the server! 
-mongoose.connect(configDB.url);
+mongoose.connect(configDB.url, {
+	useMongoClient: true
+});
 // link up passport as well
 require('./config/passport.js')(passport);
 
 // set up the stuff needed for logins/registering users/authentication 
 app.use(cookieParser()); 		// read cookies, since that is needed for authentication
-app.use(bodyParser()); 			// this gets information from html forms
+app.use(bodyParser.urlencoded({ extended: true })); // this gets information from html forms
+app.use(bodyParser.json());       // this gets json from requests
 app.set('view engine', 'ejs');	// set view engine to ejs - templates are definitely worth it for this kind of project. 
 
-// this is required for passport
-// app.use(session({ secret: 'aweawesomeawesomeawesomesome' })); // read up on session secret 
+app.use(session({
+	secret: 'aweawesomeawesomeawesomesome',
+	resave: true,
+    saveUninitialized: true
+})); // secret key for passport
 
 // make a sessionMiddleware variable to link up mongoStore in order to log all the current sessions
 // that way we can access all the current users and list them in the chatroom 
 var sessionMiddleware = session({
+	resave: true,
+    saveUninitialized: true,
 	secret: 'aweawesomeawesomeawesomesome',
 	store: new (mongoStore(session))({
 		url: configDB.url

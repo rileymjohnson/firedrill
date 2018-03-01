@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html>
+
+	<head>
+		<meta charset='utf-8'>
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+		<title>Chccs Firedrill</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	</head>
+	
+	<body>
+	
+		<button id="button">Test</button>
+		
+		<script>
+			var socket = io();
+			
+			$(function(){
+			
+				$('#button').click(function(){
+					socket.emit('update', "test");
+					return false;
+				});
+				socket.on('update', function(msg){
+					console.log(msg)
+				});
+
+			})
+
+
+			
+		</script>
+		
+	</body>
+
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html>
+
+<head>
+	<meta charset='utf-8'>
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<title>Chccs Firedrill</title>
+</head>
+
+<body>
+
+	<div id='loginScreen'>
+		
+		<!-- show message that comes back with authentication, if any -->
+		<% if (message.length > 0) { %>
+			<div class='alert'> <%= message %></div>
+		<% } %>
+		
+		<!-- login form -->
+		<form action='/login' method='post'>
+			<div>
+				<label id='user'> user name: <input name='username' type='text'></label>
+				<label id='pass'> password: <input name='password' type='password'></label>
+			</div>
+			
+			<button id='submit'> enter </button>
+		</form>
+		<!-- end form -->
+
+	</div>
+	
+</body>
+
+<script>
+</script>
+
+</html>

@@ -79,23 +79,22 @@ io.on('connection', function(socket){
 				return roomItem._id == msg.room
 			})
 			room.status = msg.status
-		    school.save(function (err) {
-		        var totalPresent = 0;
-				var total = 0;
-				var zone = school.zones.find(function(zoneItem) {
-					return zoneItem._id == msg.zone;
-				})
-				zone.rooms.forEach(function(room) {
-					if (room.periods[school.period]) {
-						total++;
-						if (room.status) {
-							totalPresent++;
-						}
+		    school.save();
+		    var totalPresent = 0;
+			var total = 0;
+			var zone = school.zones.find(function(zoneItem) {
+				return zoneItem._id == msg.zone;
+			})
+			zone.rooms.forEach(function(room) {
+				if (room.periods[school.period]) {
+					total++;
+					if (room.status) {
+						totalPresent++;
 					}
-				})
-				msg.currentPercent = Math.round((totalPresent / total) * 100)
-				io.emit('update', msg);
-		    });
+				}
+			})
+			msg.currentPercent = Math.round((totalPresent / total) * 100)
+			io.emit('update', msg);
 		})
 	});
 

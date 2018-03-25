@@ -1,39 +1,58 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html>
-
 <head>
-	<meta charset='utf-8'>
-	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
-	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.js"></script>
-	<title>Chccs Firedrill</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CHCCS Firedrill</title>
+  <link rel="stylesheet" href="/css/fontawesome.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" />
+  <link rel="stylesheet" type="text/css" href="/css/bulma.css" />
+  <link rel="stylesheet" type="text/css" href="/css/index.css" />
 </head>
-
 <body>
+  <section class="hero is-success is-fullheight">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <div class="column is-4 is-offset-4">
+          <h3 class="title has-text-grey">CHCCS Firedrill</h3>
+          <p class="subtitle has-text-grey">Please select your school to continue.</p>
+          <div class="box">
+            <figure class="avatar">
+              <img src="/img/user.png" width="128" height="128">
+            </figure>
+            <form action='/login' method='post'>
+			  <% if (message.length > 0) { %>
+			  <div class="field">
+                <label class="error">
+                  <%= message %>
+                </label>
+              </div>
+              <% } %>
 
-	<div id='loginScreen'>
-		
-		<!-- show message that comes back with authentication, if any -->
-		<% if (message.length > 0) { %>
-			<div class='alert'> <%= message %></div>
-		<% } %>
-		
-		<!-- login form -->
-		<form action='/login' method='post'>
-			<div>
-				<label id='user'> user name: <input name='username' type='text'></label>
-				<label id='pass'> password: <input name='password' type='password'></label>
-			</div>
-			
-			<button id='submit'> enter </button>
-		</form>
-		<!-- end form -->
+              <div class="field">
+                <div class="control">
+                  <div class="select">
+                    <select name="school">
+                      <% for(var i=0; i<schools.length; i++) {%>
+                         <option value="<%= schools[i]._id %>"><%= schools[i].name %></li>
+                      <% } %>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-	</div>
-	
+              <div class="field">
+                <div class="control">
+                  <input class="input is-large" type="password" placeholder="Passcode" name="password">
+                </div>
+              </div>
+              <button type="submit" class="button is-block is-info is-large is-fullwidth">Continue</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </body>
-
-<script>
-</script>
-
 </html>

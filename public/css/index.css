@@ -1,0 +1,95 @@
+html,body {
+  font-family: 'Open Sans', serif;
+  font-size: 14px;
+  font-weight: 300;
+}
+.hero.is-success {
+  background: #F2F6FA;
+}
+.hero .nav, .hero.is-success .nav {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.box {
+  margin-top: 5rem;
+}
+.avatar {
+  margin-top: -70px;
+  padding-bottom: 20px;
+}
+.avatar img {
+  padding: 5px;
+  background: #fff;
+  border-radius: 50%;
+  -webkit-box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+  box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+}
+input {
+  font-weight: 300;
+}
+p {
+  font-weight: 700;
+}
+.error {
+  color: red;
+}
+
+.select {
+  width: 100%;
+  height: 47.25px !important;
+}
+
+.select select {
+  width: 100%;
+  height: 47.25px;
+}
+
+.main-holder {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  margin-top: 25px;
+}
+
+.title {
+  text-align: center;
+}
+
+.logo {
+    position: relative;
+    top: -5px;
+}
+
+.first-tab {
+  position: relative;
+  top: 2px;
+}
+
+.zone-holder {
+  display: none;
+}
+
+.hidden-zone {
+  display: none;
+}
+
+.active-zone {
+  display: block;
+}
+
+.tabs ul {
+  margin: 0;
+}
+
+.cssProgress-bar {
+  height: 30px !important;
+}
+
+.cssProgress-label {
+    line-height: 30px !important;
+    font-size: 24px !important;
+}
+
+.table td {
+  width: 50% !important;
+}

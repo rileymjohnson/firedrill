@@ -1,18 +1,31 @@
 
 // load user model
 var User = require('../models/user.js');
+var School = require('../models/school.js');
 
 module.exports = function(app, passport){
 
 	// this will serve the login page to the user first!
 	// if login is successful, then the server can serve the chat page
 	app.get('/', function(req, res){
-		res.render('login.ejs', { message: "" });
+		School.find({}, function(err, schools) {
+		  if (err) throw err;
+		  res.render('login.ejs', {
+		  	message: "",
+		  	schools: schools
+		  });
+		});
 	});
 	
 	// show the login page 
 	app.get('/login', function(req, res){
-		res.render('login.ejs', { message: req.flash('loginMessage') });
+		School.find({}, function(err, schools) {
+		  if (err) throw err;
+		  res.render('login.ejs', {
+		  	message: req.flash('loginMessage'),
+		  	schools: schools
+		  });
+		});
 	});
 	
 	// when server receives a POST request to /login, need to check form input 
@@ -21,14 +34,29 @@ module.exports = function(app, passport){
 		failureRedirect: '/login',
 		failureFlash: true
 	}), function(req, res){
-		// go to app via 'get /app'
-		res.redirect('/app/');
+		res.redirect('/app?school=' + req.body.school);
 	});
 	
-	// direct to chatroom, with app in the url
+	// main app page
 	app.get('/app', function(req, res){
-		res.render('index.ejs', {
-			user: req.user 	// get user name from session and pass to template
+		School.findById(req.query.school, function(err, school) {
+			school.zones.forEach(function(zone) {
+				var totalPresent = 0;
+				var total = 0;
+				zone.rooms.forEach(function(room) {
+					if (room.periods[school.period]) {
+						total++;
+						if (room.status) {
+							totalPresent++;
+						}
+					}
+				})
+				zone.currentPercent = Math.round((totalPresent / total) * 100)
+			})
+			res.render('index.ejs', {
+				user: req.user, 	// get user name from session and pass to template,
+				school: school
+			});
 		});
 	});
 	

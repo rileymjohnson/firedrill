@@ -1,80 +1,23 @@
-// configure the passport strategy for local authentication 
-// using the passport object created in server.js
-// see if can keep session even after refresh:
-// https://stackoverflow.com/questions/29721225/staying-authenticated-after-the-page-is-refreshed-using-passportjs
 
 var LocalStrategy = require('passport-local').Strategy;
 
-// load user model
-var User = require('../models/user.js');
+// load school model
+var School = require('../models/school.js');
 
 // expose the following function to rest of application
 module.exports = function(passport){
 	
-	// setup passport session
-	// required for persistent login sessions! (what is a persistent login session?)
-	// passport needs to serialize and unserialize users out of sessions
-	
-	// serialize the user for the session
-	passport.serializeUser(function(user, done){
-		done(null, user.id);
+	// serialize the school for the session
+	passport.serializeUser(function(school, done){
+		done(null, school.id);
 	});
 	
-	// unserialize the user 
+	// unserialize the school 
 	passport.deserializeUser(function(id, done){
-		User.findById(id, function(err, user){
-			done(err, user);
+		School.findById(id, function(err, school){
+			done(err, school);
 		});
 	});
-	
-	/****
-	
-		this section takes care of registering new users 
-	
-	****/
-	passport.use('local-register', new LocalStrategy({
-		usernameField: 'username',
-		passwordField: 'password',
-		passReqToCallback: true // this allows the entire request to be passed to callback
-	},
-	function(req, username, password, done){
-		
-		// this is an asynchronous step
-		// User.findOne won't execute unless data is sent back 
-		process.nextTick(function(){
-			
-			// see if there is another user already with the same username 
-			User.findOne({ 'local.username' : username }, function(err, user){
-				
-				// if any errors, return the error 
-				if(err){
-					return done(err);
-				}
-				
-				// if there is a user with the same username already, show an error message
-				if(user){
-					return done(null, false, req.flash('registerMessage', 'Sorry, that username already exists')); // check template for register error message!
-				}else{
-					
-					// if no user with given username, create the new user 
-					var newUser = new User();
-					
-					// set user's local credentials 
-					newUser.local.username = username;
-					newUser.local.password = newUser.generateHash(password);
-					
-					// save the user in the database
-					newUser.save(function(err){
-						if(err){
-							throw err;
-						}
-						return done(null, newUser);
-					});
-				}
-			});
-		});
-		
-	}));
 	
 	/****
 	
@@ -82,30 +25,30 @@ module.exports = function(passport){
 	
 	****/
 	passport.use('local-login', new LocalStrategy({
-		usernameField: 'username',
+		usernameField: 'school',
 		passwordField: 'password',
 		passReqToCallback: true
 	},
-	function(req, username, password, done){ // callback with username and password from form 
-	
-		User.findOne({'local.username' : username}, function(err, user){
+	function(req, school, password, done){ // callback with school and password from form 
+		School.findOne({'_id' : school}, function(err, school){
+			
 			if(err){
 				return done(err);
 			}
 			
-			// if no user found, return error message 
-			if(!user){
+			// if no school found, return error message 
+			if(!school){
 				// req.flash sets flashdata using connect-flash
-				return done(null, false, req.flash('loginMessage', 'Sorry, that user is not registered!'));
+				return done(null, false, req.flash('loginMessage', 'the password was incorrect'));
 			}
 			
-			// if user is found but password incorrect
-			if(!user.validPassword(password)){
-				return done(null, false, req.flash('loginMessage', 'Wrong password!'));
+			// if school is found but password incorrect
+			if(!school.validPassword(password)){
+				return done(null, false, req.flash('loginMessage', 'The password was incorrect'));
 			}
 			
-			// success, return user
-			return done(null, user);
+			// success, return school
+			return done(null, school);
 		});
 	}));
 	

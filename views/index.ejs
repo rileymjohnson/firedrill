@@ -6,32 +6,137 @@
 		<meta charset='utf-8'>
 		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
 		<title>Chccs Firedrill</title>
-		<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.js"></script>
+		<script type="text/javascript" src="/js/progressbar.min.js"></script>
+		<link rel="stylesheet" href="/css/fontawesome.min.css" />
+	 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" />
+		<link rel="stylesheet" type="text/css" href="/css/bulma.css" />
+		<link rel="stylesheet" type="text/css" href="/css/bulma-switch.min.css" />
+		<link rel="stylesheet" type="text/css" href="/css/progressbar.min.css" />
+	 	<link rel="stylesheet" type="text/css" href="/css/index.css" />
 	</head>
 	
 	<body>
-	
-		<button id="button">Test</button>
+
+		<nav class="navbar is-transparent">
+		  <div class="navbar-menu">
+		    <a class="navbar-item" href="/">
+		      <img src="/img/logo.png" alt="firecaptain logo" class="logo">
+		    </a>
+		  </div>
+
+		  <div class="navbar-menu" style="display: block !important">
+		  	<p class="navbar-item title">
+			  <%= school.name %>
+			</p>
+		  </div>
+
+		</nav>
+
+		<div class="card main-holder">
+		  <div class="card-content">
+		    <div class="content">
+
+		      	<div class="tabs is-toggle is-fullwidth">
+				  <ul>
+				  	<% for(var i=0; i<school.zones.length; i++) {%>
+			        	<li class="<%if (i == 0) { %>first-tab is-active <% } %>tab-item" data-id="<%= school.zones[i]._id%>">
+					      <a>
+					        <span>Zone <%= school.zones[i].name %></span>
+					      </a>
+					    </li>
+			        <% } %>
+				  </ul>
+				</div>
+
+				<div class="main">
+					<% for(var i=0; i<school.zones.length; i++) {%>
+			        	<div class="zone-holder <%= school.zones[i]._id%><%if (i == 0) { %> active-zone<% } %>">
+
+			        		<div class="cssProgress">
+						        <div class="progress1">
+						          <div class="cssProgress-bar cssProgress-success cssProgress-stripes" style="width: <%= school.zones[i].currentPercent%>%;">
+						            <span class="cssProgress-label"><%= school.zones[i].currentPercent%>%</span>
+						          </div>
+						        </div>
+						      </div>
+			        		
+			        		<table class="table is-striped is-hoverable">
+							  <thead>
+							  <tr>
+							     <th>Room #</th>
+							     <th>Status</th>
+							  </tr>
+							  </thead>
+							  <tfoot>
+
+							 	<% for(var j=0; j<school.zones[i].rooms.length; j++) {%>
+						        	<%if (school.zones[i].rooms[j].periods[school.period]) { %>
+										<tr>
+											<td><%= school.zones[i].rooms[j].name %></td>
+											<td>
+												<div class="field">
+													<input type="checkbox" class="switch is-large room-switch" id="<%= school.zones[i].rooms[j]._id %>"<%if (school.zones[i].rooms[j].status) { %> checked="checked"<% } %>>
+													<label for="<%= school.zones[i].rooms[j]._id %>"><% if(school.zones[i].rooms[j].status){ %>Present<% } else{ %>Absent<% } %></label>
+												</div>
+											</td>
+										</tr>
+									<% } %>
+						        <% } %>
+
+							  </tbody>
+							</table>
+
+					    </div>
+			        <% } %>
+				</div>
+
+		    </div>
+		  </div>
+		</div>
 		
 		<script>
+
+			//initialize progress bars
+			<% for(var i=0; i < school.zones.length; i++) { %>
+			   $('#progressbar-<%= school.zones[i]._id %>').progress_fnc();
+			<% } %>
+
+			var school = "<%= school._id %>"
+			var activeZone = "<%= school.zones[0]._id %>"
 			var socket = io();
 			
 			$(function(){
-			
-				$('#button').click(function(){
-					socket.emit('update', "test");
-					return false;
-				});
-				socket.on('update', function(msg){
-					console.log(msg)
-				});
+
+				socket.on("update", function(msg) {
+					$("#" + msg.room).prop('checked', msg.status); //change switch status
+					//update progress bar
+					$("." + msg.zone + " .cssProgress-bar").css("width", msg.currentPercent + "%")
+					$("." + msg.zone + " .cssProgress-label").html(msg.currentPercent + "%")
+				})
+
+				//handles changing of the tabs
+				$(".tab-item").click(function() {
+					$(".tab-item").removeClass("is-active")
+					$(this).addClass("is-active")
+					$(".zone-holder").removeClass("active-zone")
+					$("." + $(this).data("id")).addClass("active-zone")
+					activeZone = $(this).data("id")
+				})
+
+				$(".room-switch").change(function() {
+					$(this).next().html($(this).is(":checked")? "Present" : "Absent") //switches the text to match the checkbox
+
+					socket.emit('update', {
+						school: school,
+						zone: activeZone,
+						room: $(this).prop("id"),
+						status: $(this).is(":checked")
+					});
+				})
 
 			})
-
-
-			
 		</script>
 		
 	</body>

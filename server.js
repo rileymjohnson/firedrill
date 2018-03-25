@@ -18,6 +18,8 @@ var session = 			require('express-session');
 var assert =		    require('assert');
 var mongoStore = 		require("connect-mongo");
 
+var School = require('./models/school.js')
+
 // './' is current directory 
 var configDB = require('./config/database.js');
 // need to connect the database with the server! 
@@ -32,6 +34,7 @@ app.use(cookieParser()); 		// read cookies, since that is needed for authenticat
 app.use(bodyParser.urlencoded({ extended: true })); // this gets information from html forms
 app.use(bodyParser.json());       // this gets json from requests
 app.set('view engine', 'ejs');	// set view engine to ejs - templates are definitely worth it for this kind of project. 
+app.use(express.static('public')) // serve public files
 
 app.use(session({
 	secret: 'aweawesomeawesomeawesomesome',
@@ -65,12 +68,35 @@ io.use(function(socket, next){
 	sessionMiddleware(socket.request, {}, next);
 });
 
-// array to store all currently logged in users 
-var users = [];
 io.on('connection', function(socket){
 	
 	socket.on('update', function(msg){
-		io.emit('update', msg);
+		School.findById(msg.school, function(error, school) {
+			var zone = school.zones.find(function(zoneItem) {
+				return zoneItem._id == msg.zone
+			})
+			var room = zone.rooms.find(function(roomItem) {
+				return roomItem._id == msg.room
+			})
+			room.status = msg.status
+		    school.save(function (err) {
+		        var totalPresent = 0;
+				var total = 0;
+				var zone = school.zones.find(function(zoneItem) {
+					return zoneItem._id == msg.zone;
+				})
+				zone.rooms.forEach(function(room) {
+					if (room.periods[school.period]) {
+						total++;
+						if (room.status) {
+							totalPresent++;
+						}
+					}
+				})
+				msg.currentPercent = Math.round((totalPresent / total) * 100)
+				io.emit('update', msg);
+		    });
+		})
 	});
 
 });

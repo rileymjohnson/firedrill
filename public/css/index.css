@@ -93,3 +93,7 @@ p {
 .table td {
   width: 50% !important;
 }
+
+.hero-body {
+  padding: 0 !important;
+}
